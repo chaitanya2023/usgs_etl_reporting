@@ -1,0 +1,82 @@
+# below database design for earthquake data elements in the link below
+# https://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php
+# database structures are in SQLite database 
+# https://www.sqlite.org/datatype3.html
+
+# table to stage the csv file from USGS site
+create table event_stage
+(
+time varchar(255),
+latitude varchar(255), 
+longitude varchar(255),
+depth varchar(255),
+mag varchar(255),
+magType varchar(255),
+nst varchar(255),
+gap varchar(255),
+dmin varchar(255),
+rms varchar(255),
+net varchar(255),
+id varchar(255),
+updated varchar(255),
+place varchar(255),
+type varchar(255),
+locationSource varchar(255),
+magSource varchar(255),
+horizontalError varchar(255),
+depthError varchar(255),
+magError varchar(255),
+magNst varchar(255),
+status varchar(255)
+);
+
+# table to store event place related information 
+create table eventplace
+(
+eventid integer,
+latitude varchar(255),
+longitude varchar(255),
+depth varchar(255),   
+place varchar(255),
+
+);
+
+# table to store event time related information 
+create table eventtime
+(
+eventid integer,
+eventtime text,  #TEXT as ISO8601 strings ("YYYY-MM-DD HH:MM:SS.SSS")
+eventyear integer,
+eventmonth integer,
+eventday integer,
+eventquarter integer,
+eventweek integer,
+eventweekday integer,
+eventhour integer
+);
+
+# table to store event evaluation data related information 
+create table eventevaluationdata
+(
+eventid integer,
+nst integer, 
+gap text,
+dmin integer,
+rms real,
+eventtype varchar(255),
+horizontalerror real,
+deptherror real,
+magerror real,
+magnst integer,
+magsource varchar(255)
+);
+
+# table to store event information
+create table event
+(
+eventid integer,
+magnitude real,
+magnitude_type varchar(255),
+eventupdated datetime,
+locationsource varchar(255),
+);

@@ -1,0 +1,61 @@
+#Provide query/analysis to give biggest earthquake of 2017
+
+select
+	et.eventyear,
+	max(ev.magnitude) "max magnitude"
+from
+event ev
+join eventtime et on ev.eventid = et.eventid
+where
+	et.eventyear = 2017
+group by et.eventyear
+limit 1;
+
+#Provide query/analysis to give most probable hour of the day for the earthquakes bucketed by the range of magnitude 
+#(0-1,1-2,2-3,3-4,4-5,5-6,>6   For border values in the bucket, include them in the bucket where the value is a lower limit 
+#so for 1 include it in 1-2 bucket)
+
+with event_magnitude as 
+(
+	select 
+		et.eventhour,
+		case when ev.magnitude < 1 then '0-1'
+		     when ev.magnitude < 2 then '1-2'
+                     when ev.magnitude < 3 then '2-3'
+                     when ev.magnitude < 4 then '3-4'
+		     when ev.magnitude < 5 then '4-5'
+                     when ev.magnitude < 6 then '5-6'
+		     when ev.magnitude > 6 then '>6'	
+                end magnitude_range
+	from
+	event ev
+	join eventtime et on ev.eventid = eventid
+),
+event_aggregation as 
+(
+	select 
+		magnitude_range,
+		et.eventhour,
+		count(*) total_events_by_hour_range
+	from
+		event_magnitude 
+	group by 
+		magnitude_range,
+		et.eventhour
+)
+
+	select
+		magnitude_range,
+		et.eventhour
+	from
+		event_aggregation display
+	where
+		display.total_events_by_hour_range = 
+		(
+			select 
+				max(max_finder.total_events_by_hour_range)
+			from
+				event_aggregation max_finder
+			where 
+				max_finder.magnitude_range = display.magnitude_range	
+		)
